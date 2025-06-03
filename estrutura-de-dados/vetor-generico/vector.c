@@ -17,6 +17,7 @@ new_vector(size_t type_size, Type type)
     com o tamanho em bytes do tipo pois o vetor armazenará elementos deste tipo */
     v->data = malloc(v->capacity * type_size);
     v->push_back = push_back;
+    v->push_front = push_front;
     v->show = show;
     v->at = at;
     v->front = front;
@@ -105,6 +106,17 @@ push_back(vector *v, void* value)
 }
 
 void
+push_front(vector *v, void *value)
+{
+    if (v->size == v->capacity) {
+        reserve(v, MAX(1, v->capacity*2));
+    }
+    v->size++;
+    memmove((char*)v->data + v->type_size, v->data, v->size * v->type_size);
+    memcpy(v->data, value, v->type_size);
+}
+
+void
 show(vector* v, Type type)
 {
     printf("[ ");
@@ -123,7 +135,7 @@ show(vector* v, Type type)
                 if (i < v->size-1) {
                     printf("%.2f, ", *(float*)((char*)v->data + i * v->type_size));
                 } else {
-                    printf("%.2f", *(float*)((float*)v->data + i * v->type_size));
+                    printf("%.2f", *(float*)((char*)v->data + i * v->type_size));
                 }
             }
             break;
@@ -132,7 +144,7 @@ show(vector* v, Type type)
                 if (i < v->size-1) {
                     printf("%s, ", *(char**)((char*)v->data + i * v->type_size));
                 } else {
-                    printf("%s", *(char**)((float*)v->data + i * v->type_size));
+                    printf("%s", *(char**)((char*)v->data + i * v->type_size));
                 }
             }
             break;

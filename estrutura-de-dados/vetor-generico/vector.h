@@ -16,6 +16,7 @@ typedef struct vector {
     size_t capacity; // capacidade do vetor
     size_t type_size; // tamanho de cada elemento. vai receber o tamanho do tipo do elemento com sizeof()
     void (*push_back)(struct vector*, void*);
+    void (*push_front)(struct vector*, void*);
     Type type;
     void (*show)(struct vector*, Type);
     void *(*at)(struct vector*, int index);
@@ -31,6 +32,7 @@ void free_vet(vector *v);
 
 // Vector methods declarations
 void push_back(vector *v, void* value);
+void push_front(vector *v, void* value);
 void show(vector* v, Type type);
 void *at(struct vector* v, int index);
 void *front(struct vector* v);
