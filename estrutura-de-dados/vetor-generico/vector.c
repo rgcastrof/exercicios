@@ -1,4 +1,3 @@
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +17,9 @@ new_vector(size_t type_size, Type type)
     v->data = malloc(v->capacity * type_size);
     v->push_back = push_back;
     v->push_front = push_front;
+    v->insert = insert;
+    v->clear = clear;
+    v->empty = empty;
     v->show = show;
     v->at = at;
     v->front = front;
@@ -83,6 +85,15 @@ int size(vector *v) {
     return count;
 }
 
+bool
+empty(vector* v)
+{
+    if (v->len(v) == 0) {
+        return true;
+    }
+    return false;
+}
+
 int capacity(vector *v) {
     return v->capacity;
 }
@@ -111,9 +122,35 @@ push_front(vector *v, void *value)
     if (v->size == v->capacity) {
         reserve(v, MAX(1, v->capacity*2));
     }
+    /* Incrementa o tamanho do vetor em um e usa a função memmove para copiar
+     * o bloco de memória do vetor uma posição pra frente, depois copia o elemento
+     * a ser inserido para a primeira posição. */
     v->size++;
     memmove((char*)v->data + v->type_size, v->data, v->size * v->type_size);
     memcpy(v->data, value, v->type_size);
+}
+
+void
+insert(vector* v, int pos, void* value)
+{
+    if (pos < 0 || pos > v->len(v)) {
+        fprintf(stderr, "fail: invalid insert position");
+        return;
+    }
+    if (v->size == v->capacity) {
+        reserve(v, MAX(1, v->capacity*2));
+    }
+
+    v->size++;
+    memmove((char*)v->data + ((pos+1) * v->type_size), (char*)v->data + ((pos) * v->type_size), (v->size - pos) * v->type_size);
+    memcpy((char*)v->data + (pos * v->type_size), value, v->type_size);
+}
+
+void
+clear(vector *v)
+{
+    free(v->data);
+    v->size = 0;
 }
 
 void
@@ -126,7 +163,7 @@ show(vector* v, Type type)
                 if (i < v->size-1) {
                     printf("%d, ", *(int*)((char*)v->data + i * v->type_size));
                 } else {
-                    printf("%d", *(int*)((char*)v->data + i * v->type_size));
+                    printf("%d ", *(int*)((char*)v->data + i * v->type_size));
                 }
             }
             break;
@@ -135,7 +172,7 @@ show(vector* v, Type type)
                 if (i < v->size-1) {
                     printf("%.2f, ", *(float*)((char*)v->data + i * v->type_size));
                 } else {
-                    printf("%.2f", *(float*)((char*)v->data + i * v->type_size));
+                    printf("%.2f ", *(float*)((char*)v->data + i * v->type_size));
                 }
             }
             break;
@@ -144,12 +181,12 @@ show(vector* v, Type type)
                 if (i < v->size-1) {
                     printf("%s, ", *(char**)((char*)v->data + i * v->type_size));
                 } else {
-                    printf("%s", *(char**)((char*)v->data + i * v->type_size));
+                    printf("%s ", *(char**)((char*)v->data + i * v->type_size));
                 }
             }
             break;
     }
-    printf(" ]\n");
+    printf("]\n");
 }
 
 void
