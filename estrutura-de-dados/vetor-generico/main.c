@@ -8,14 +8,14 @@ int main() {
     }
     int b = 99;
     v->push_front(v, &b);
-    // v->clear(v);
     int c = 100;
     printf("antes: ");
     v->show(v, INT);
-    printf("%d", v->len(v));
-    v->insert(v, 1, &c);
+    printf("tamanho: %d\n", v->len(v));
+    v->erase(v, 3);
     printf("depois: ");
     v->show(v, INT);
+    printf("está vazio: ");
     if (v->empty(v) == true) {
         printf("true\n");
     } else {

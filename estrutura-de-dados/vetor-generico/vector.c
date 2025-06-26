@@ -18,6 +18,9 @@ new_vector(size_t type_size, Type type)
     v->push_back = push_back;
     v->push_front = push_front;
     v->insert = insert;
+    v->pop_back = pop_back;
+    v->pop_front = pop_front;
+    v->erase = erase;
     v->clear = clear;
     v->empty = empty;
     v->show = show;
@@ -60,7 +63,7 @@ at(vector* v, int index)
 
 void *front(vector* v) {
     if (v->size == 0) {
-        fprintf(stderr, "fail: empty vector");
+        fprintf(stderr, "fail: empty vector\n");
         return NULL;
     }
     return (char*)v->data;
@@ -68,7 +71,7 @@ void *front(vector* v) {
 
 void *back(vector* v) {
     if (v->size == 0) {
-        fprintf(stderr, "fail: empty vector");
+        fprintf(stderr, "fail: empty vector\n");
         return NULL;
     }
     return (char*)v->data + (v->size-1) * v->type_size;
@@ -134,7 +137,7 @@ void
 insert(vector* v, int pos, void* value)
 {
     if (pos < 0 || pos > v->len(v)) {
-        fprintf(stderr, "fail: invalid insert position");
+        fprintf(stderr, "fail: invalid insert position\n");
         return;
     }
     if (v->size == v->capacity) {
@@ -144,6 +147,44 @@ insert(vector* v, int pos, void* value)
     v->size++;
     memmove((char*)v->data + ((pos+1) * v->type_size), (char*)v->data + ((pos) * v->type_size), (v->size - pos) * v->type_size);
     memcpy((char*)v->data + (pos * v->type_size), value, v->type_size);
+}
+
+void
+pop_back(vector *v)
+{
+    if (v->empty(v)) {
+        fprintf(stderr, "vector is empty\n");
+        exit(1);
+    }
+    v->size--;
+}
+
+void
+pop_front(vector *v)
+{
+    if (v->empty(v)) {
+        fprintf(stderr, "vector is empty\n");
+        exit(1);
+    }
+    memmove((char*)v->data, (char*)v->data + v->type_size, (v->size - 1) * v->type_size);
+    v->size--;
+}
+
+void
+erase(vector *v, int pos)
+{
+    if (pos < 0 || pos > v->len(v)) {
+        fprintf(stderr, "fail: invalid erase position\n");
+        exit(1);
+    }
+
+    if (v->empty(v)) {
+        fprintf(stderr, "vector is empty\n");
+        exit(1);
+    }
+
+    memmove((char*)v->data + (pos * v->type_size), (char*)v->data + ((pos+1) * v->type_size), (v->size - pos - 1) * v->type_size);
+    v->size--;
 }
 
 void
